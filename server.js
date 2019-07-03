@@ -1,8 +1,14 @@
 var express = require('express');
 var app = express();
-var bodyParser = require('body-parser');
-app.use(bodyParser.json())
+const cors = require('cors')
 
+// var allowCrossDomain = function(req, res, next) {
+//     res.header('Access-Control-Allow-Origin', '*');
+//     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')};
+//     app.use(allowCrossDomain);
+var bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(cors({ origin: 'http://localhost:4205' }));
 // Configuring the database
 const dbConfig = require('./app/config/mongodb.config.js');
 const mongoose = require('mongoose');

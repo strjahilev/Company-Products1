@@ -93,6 +93,21 @@ exports.findAll = (req, res) => {
         });
     });
 };
+exports.create = (req, res) =>{
+if (!req.body){
+	return res.sendStatus(400);
+	const compName = req.body.name;
+	const compStreet = req.body.street;
+	const compPhone = req.body.phone
+}
+Company({name: compName, street: compStreet, phone: compPhone });
+company.save(function (err) {
+	if(err){
+		return console.log(err);
+		res.send(company);
+	}
+});
+};
 exports.update = (req, res) =>{
 		if (!req.body.name) {
 			return res.status(400).send({
