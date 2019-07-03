@@ -8,7 +8,7 @@ const cors = require('cors')
 //     app.use(allowCrossDomain);
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
-app.use(cors({ origin: 'http://localhost:4205' }));
+app.use(cors({ origin: true }));
 // Configuring the database
 const dbConfig = require('./app/config/mongodb.config.js');
 const mongoose = require('mongoose');
