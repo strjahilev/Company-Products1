@@ -51,6 +51,23 @@ exports.findByCompanyId = (req, res) => {
 		res.send(products);
 	});
 };
+
+exports.create = (req, res) =>{
+	if (!req.body) {
+		return res.sendStatus(400);
+	}
+	const prodCode = req.body.code;
+	const prodName = req.body.name;
+	const prodDetails = req.body.details;
+	const prodCompany = req.body.company._id;
+	const product = Product({code: prodCode, name: prodName, details: prodDetails, company: prodCompany });
+	product.save(function (err) {
+		if(err){
+			return console.log(err)}
+		res.send(product);
+
+	});
+};
 exports.update = (req, res) =>{
 	if(!req.body.details) {
 		return res.status(400).send({
