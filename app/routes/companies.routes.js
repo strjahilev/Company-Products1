@@ -9,3 +9,4 @@ module.exports = function(app) {
 	app.put('/api/companies/:companyId', companies.update);
 	app.delete('/api/companies/:companyId', companies.delete);
 };
+

@@ -1,5 +1,6 @@
 const Company = require('../models/company.model.js');
 const Product = require('../models/product.model.js');
+const Owner = require('../models/owner.js');
 
 exports.init = (req, res) => {
   var apple = new Company({ 
@@ -9,9 +10,9 @@ exports.init = (req, res) => {
   });
 
   apple.save(function (err) {
-    if(err) return console.error(err.stack)
+    if(err) return console.error(err.stack);
 	
-	console.log("Apple company is added")
+	console.log("Apple company is added");
 	
     //Apple now exists, so lets create a Product
     var iphone7 = new Product({
@@ -41,7 +42,29 @@ exports.init = (req, res) => {
 	});
 	
   });
-  
+	var jack = new Owner({
+		name: 'Jack',
+	});
+	jack.companies.push(apple._id);
+
+	var peter = new Owner({
+		name: 'Peter',
+
+	});
+	peter.companies.push(apple._id)
+
+	peter.save(function(err){
+		if(err) return console.log(err.stack);
+		console.log("Peter is added")
+	});
+
+	jack.save(function(err){
+		if(err) return console.log(err.stack);
+		console.log("Jack is added");
+	});
+
+
+
   
   var samsung = new Company({ 
 		name: 'Samsung', 
@@ -93,11 +116,15 @@ exports.findAll = (req, res) => {
         });
     });
 };
+
+
+
 exports.create = (req, res) =>{
 if (!req.body){
 	return res.sendStatus(400);
 
 }
+
 	const compName = req.body.name;
 	const compStreet = req.body.street;
 	const compPhone = req.body.phone;
@@ -110,10 +137,29 @@ company.save(function (err) {
 });
 };
 exports.findById = (req,res) =>{
-    const id = req.params.companyId;
+	const id = req.params.companyId;
     Company.findOne({_id:id}, function (err, company) {
+    	if(!id){
+    		return res.status(404).send({
+				message:"Company not found by Id"
+			})
+		}
         res.send(company);
+
     })
+};
+exports.findByName = (req,res) => {
+	const name = req.params.companyName;
+	const street = req.params.companyStreet;
+	const phone = req.params.companyPhone;
+	Company.findOne({name: name, street: street, phone:phone}, function (err,company) {
+		if(!id&&street&&phone) {
+			return res.status(404).send({
+				message:"Company not found"
+			})
+		}
+		res.send(company)
+	})
 };
 
 exports.update = (req, res) =>{
@@ -147,11 +193,11 @@ exports.update = (req, res) =>{
 		});
 };
 exports.delete = (req, res) => {
-		Company.findByIdAndRemove(req.params.companyId)
+	Company.findByIdAndRemove(req.params.companyId)
 			.then(companyId => {
 				if(!companyId){
 					return res.status(404).send({
-						message: "Company not found with id" + req.params.companyId
+						message: "Company not found with id" + req.params.CompanyId
 					});
 				}
 				res.send({message:"Company deleted successfully!"});
@@ -165,4 +211,5 @@ exports.delete = (req, res) => {
 					message:"Could not delete company with id " + req.params.companyId
 				});
 		});
+
 };

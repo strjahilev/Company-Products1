@@ -3,7 +3,18 @@ const Product = require('../models/product.model.js');
 
 exports.findAll = (req, res) => {
 	
-	Product.find()
+	Product.aggregate([
+		{ $lookup:
+				{
+					from: 'companies',
+					localField: 'company',
+					foreignField: '_id',
+					as: 'company'
+				}
+		}]
+
+	)
+
     .then(products => {
         res.send(products);
     }).catch(err => {
@@ -35,8 +46,8 @@ exports.findByName = (req, res) => {
 
 // Find all products by a CompanyId
 exports.findByCompanyId = (req, res) => {
-    Product.find({ company : req.params.companyId })
-	.exec(function (err, products) {
+    Company.findOne({ _id : req.params.companyId })
+	.exec(function (err, companies) {
 		if (err){
 			if(err.kind === 'ObjectId') {
 				return res.status(404).send({
@@ -48,7 +59,7 @@ exports.findByCompanyId = (req, res) => {
 			});
 		}
 					
-		res.send(products);
+		res.send(companies);
 	});
 };
 
@@ -59,9 +70,10 @@ exports.create = (req, res) =>{
 	const prodCode = req.body.code;
 	const prodName = req.body.name;
 	const prodDetails = req.body.details;
-	const prodCompany = req.body.company._id;
+	const prodCompany = req.body.company;
 	const product = Product({code: prodCode, name: prodName, details: prodDetails, company: prodCompany });
 	product.save(function (err) {
+
 		if(err){
 			return console.log(err)}
 		res.send(product);
@@ -69,16 +81,18 @@ exports.create = (req, res) =>{
 	});
 };
 exports.update = (req, res) =>{
-	if(!req.body.details) {
+	if(!req.body) {
 		return res.status(400).send({
 			message: "Product content can not be empty"
 		});
 	}
+
 	Product.findByIdAndUpdate(req.params.productId,{
 		code: req.body.code || "Untitled Product",
 		name: req.body.name,
 		details: req.body.details,
-		company:req.body.company
+		company:req.body.company,
+
 	}, {new: true})
 		.then(product =>{
 			if(!product){
@@ -87,6 +101,7 @@ exports.update = (req, res) =>{
 				});
 			}
 			res.send(product);
+
 		}).catch(err =>{
 			if(err.kind==='ObjectId'){
 				return res.status(404).send({
